@@ -13,7 +13,7 @@
 		<property name="debug" value="true" overwrite="false" />
 		<property name="build.dir" value="bin" overwrite="false" />
 		<property name="source.dir" value="Source" />
-		<property name="content.dir" value="Content" />
+		<property name="content.dir" value="Source/Content" />
 		<target name="clean" description="remove all generated files">
 			<delete file="${build.dir}/Dictionariosaur.exe" failonerror="false" />
 			<delete file="${build.dir}/Dictionariosaur.pdb" failonerror="false" />

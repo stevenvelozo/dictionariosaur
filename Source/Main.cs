@@ -5,10 +5,10 @@
 *
 * @license MIT License
 * @copyright Copyright (c) 2013, Steven Velozo
-* 
-* Dictionariosaur is an application meant to provide dictionary tools for 
+*
+* Dictionariosaur is an application meant to provide dictionary tools for
 * scrabble and anagramming.
-* 
+*
 * Searchable lists via telnet, http and GUI as well as (eventually) timer
 * functions to allow game-timers.  Will require chat functions at that
 * point as well.
@@ -33,7 +33,7 @@ namespace Dictionariosaur
 			tmpWorkingApplicationThread.ThreadedTask(250);
 		}
 	}
-	
+
 	/// <summary>
 	/// This class encapsulates all the structures, threads and data that is required to keep this
 	/// program running.  It is segregated from the actual interface so we can easily compile it
@@ -49,11 +49,11 @@ namespace Dictionariosaur
 
 		//Telnet Server
 		private TelnetServer _TelnetServer;
-		
+
 		//Word List
 		private WordList _WordList;
-		
-		
+
+
 		public MainApplication()
 		{
 			//Configure the main application log
@@ -65,18 +65,18 @@ namespace Dictionariosaur
 			_TelnetLogFile = new LogFile ("Telnet");
 			_TelnetLogFile.EchoToConsole = true;
 			_TelnetServer = new TelnetServer (9000);
-			
+
 			//Attach the Write Log event to our pass-through write log event handler
 			_TelnetServer.WriteLog += new WriteLogEventHandler(ChainedTelnetWriteLog);
 			//Attach the telnet server command recieved event to our handler
-			_TelnetServer.CommandRecieved += new TelnetServerCommandEventHandler(TelnetCommandRecieved);			
-			
+			_TelnetServer.CommandRecieved += new TelnetServerCommandEventHandler(TelnetCommandRecieved);
+
 			InitializeTelnetServer();
-			
+
 			_WordList = new WordList();
 			_WordList.WriteLog += new WriteLogEventHandler(ChainedWriteLog);
 		}
-		
+
 		/// <summary>
 		/// This is useful to keep the console application running.  Since everything is an
 		/// asynchronous callback, this really is just here until the user presses "Ctrl + C".
@@ -95,24 +95,24 @@ namespace Dictionariosaur
 		{
 			// The string we'll return
 			System.Text.StringBuilder tmpSortedString;
-			
+
 			tmpSortedString = new System.Text.StringBuilder();
-			
+
 			// The byte array we'll use to sort
 			Array tmpStringByteArray = Array.CreateInstance(typeof(Byte), pFromString.Length);
-			
+
 			// Now we need to assign FromString to the array
 			tmpStringByteArray = System.Text.Encoding.ASCII.GetBytes (pFromString);
-			
+
 			// Now sort it (good thing bytes are icomparible)
 			Array.Sort(tmpStringByteArray);
-			
+
 			// Now convert it back to a unicode string.
 			foreach (byte tmpByte in tmpStringByteArray)
 			{
 				tmpSortedString.Append(Convert.ToChar(tmpByte));
 			}
-			
+
 			WriteToLog("Converted string ["+pFromString+"] to Alphagram ["+tmpSortedString.ToString().Trim()+"]");
 
 			return tmpSortedString.ToString().Trim();
@@ -157,7 +157,7 @@ namespace Dictionariosaur
 						if (tmpCommandArguments.Length > 1)
 						{
 							System.Text.StringBuilder tmpSearchString = new System.Text.StringBuilder();
-							
+
 							for (int tmpCounter = 1; tmpCounter < tmpCommandArguments.Length; tmpCounter++)
 							{
 								//Add back the spaces to make the search meaningful.
@@ -169,9 +169,9 @@ namespace Dictionariosaur
 
 							_TelnetServer.SendData ("Adding ["+tmpSearchString.ToString()+"] to the word list.", pEventArgs.Socket);
 							_TelnetServer.SendLineFeed (pEventArgs.Socket);
-							
+
 							_WordList.AddWord(tmpSearchString.ToString());
-							
+
 							_TelnetServer.SendData ("There are now "+_WordList.Count+" items in the word list.", pEventArgs.Socket);
 							_TelnetServer.SendLineFeed (pEventArgs.Socket);
 						}
@@ -181,7 +181,7 @@ namespace Dictionariosaur
 							_TelnetServer.SendLineFeed (pEventArgs.Socket);
 						}
 						break;
-						
+
 					case "AL":
 					case "ALP":
 					case "ALPH":
@@ -189,7 +189,7 @@ namespace Dictionariosaur
 						if (tmpCommandArguments.Length > 1)
 						{
 							System.Text.StringBuilder tmpSearchString = new System.Text.StringBuilder();
-							
+
 							for (int tmpCounter = 1; tmpCounter < tmpCommandArguments.Length; tmpCounter++)
 							{
 								//Add back the spaces to make the search meaningful.
@@ -210,7 +210,7 @@ namespace Dictionariosaur
 							_TelnetServer.SendLineFeed (pEventArgs.Socket);
 						}
 						break;
-						
+
 					case "CO":
 					case "COU":
 					case "COUN":
@@ -223,7 +223,7 @@ namespace Dictionariosaur
 						//Kill the socket
 						pEventArgs.Socket.Kill();
 						break;
-					
+
 					case "?":
 					case "H":
 					case "HE":
@@ -263,7 +263,7 @@ namespace Dictionariosaur
 						if (tmpCommandArguments.Length > 1)
 						{
 							System.Text.StringBuilder tmpSearchString = new System.Text.StringBuilder();
-							
+
 							for (int tmpCounter = 1; tmpCounter < tmpCommandArguments.Length; tmpCounter++)
 							{
 								//Add back the spaces to make the search meaningful.
@@ -272,7 +272,7 @@ namespace Dictionariosaur
 
 								tmpSearchString.Append(tmpCommandArguments[tmpCounter].ToString());
 							}
-							
+
 							SendTelnetWordList (pEventArgs, tmpSearchString.ToString().Trim());
 						}
 						else
@@ -283,35 +283,35 @@ namespace Dictionariosaur
 							_TelnetServer.SendLineFeed (pEventArgs.Socket);
 						}
 						break;
-						
+
 					case "LOAD":
 						System.Text.StringBuilder tmpFileName = new System.Text.StringBuilder();
 
 						if (tmpCommandArguments.Length < 2)
 						{
-							_TelnetServer.SendData ("No File Specified; Using 'Content/Scrabble.txt'", pEventArgs.Socket);
+							_TelnetServer.SendData ("No File Specified; Using 'Scrabble.txt'", pEventArgs.Socket);
 							_TelnetServer.SendLineFeed (pEventArgs.Socket);
-							
-							tmpFileName.Append("Content/Scrabble.txt");
+
+							tmpFileName.Append("Scrabble.txt");
 						}
 						else
 						{
-							
+
 							for (int tmpCounter = 1; tmpCounter < tmpCommandArguments.Length; tmpCounter++)
 							{
 								//Add back the spaces to make the search meaningful.
 								if (tmpFileName.Length > 0)
 									tmpFileName.Append(" ");
-	
+
 								tmpFileName.Append(tmpCommandArguments[tmpCounter].ToString());
 							}
 						}
-	
+
 						_TelnetServer.SendData ("Loading ["+tmpFileName.ToString()+"] into the word list.", pEventArgs.Socket);
 						_TelnetServer.SendLineFeed (pEventArgs.Socket);
-						
+
 						_WordList.LoadWordList (tmpFileName.ToString());
-						
+
 						_TelnetServer.SendData ("There are now "+_WordList.Count+" items in the word list.", pEventArgs.Socket);
 						_TelnetServer.SendLineFeed (pEventArgs.Socket);
 						break;
@@ -332,7 +332,7 @@ namespace Dictionariosaur
 						if (tmpCommandArguments.Length > 1)
 						{
 							System.Text.StringBuilder tmpSearchString = new System.Text.StringBuilder();
-							
+
 							for (int tmpCounter = 1; tmpCounter < tmpCommandArguments.Length; tmpCounter++)
 							{
 								//Add back the spaces to make the search meaningful.
@@ -344,11 +344,11 @@ namespace Dictionariosaur
 
 							_TelnetServer.SendData ("Searching for word ["+tmpSearchString.ToString()+"] in the word list.", pEventArgs.Socket);
 							_TelnetServer.SendLineFeed (pEventArgs.Socket);
-							
+
 							if (_WordList.FindFirstByWord (tmpSearchString.ToString()))
 							{
 								_TelnetServer.SendData ("Found a match!", pEventArgs.Socket);
-								_TelnetServer.SendLineFeed (pEventArgs.Socket);								
+								_TelnetServer.SendLineFeed (pEventArgs.Socket);
 								_TelnetServer.SendData (String.Format(" {0}. {1}          Alphagram[{2}]", _WordList.CurrentItemKey ,_WordList.CurrentWord, _WordList.CurrentWordAlphagram), pEventArgs.Socket);
 								_TelnetServer.SendLineFeed (pEventArgs.Socket);
 							}
@@ -356,7 +356,7 @@ namespace Dictionariosaur
 							{
 								_TelnetServer.SendData ("No matches!\n\r", pEventArgs.Socket);
 								_TelnetServer.SendLineFeed (pEventArgs.Socket);
-							}			
+							}
 						}
 						else
 						{
@@ -369,7 +369,7 @@ namespace Dictionariosaur
 						if (tmpCommandArguments.Length > 1)
 						{
 							System.Text.StringBuilder tmpSearchString = new System.Text.StringBuilder();
-							
+
 							for (int tmpCounter = 1; tmpCounter < tmpCommandArguments.Length; tmpCounter++)
 							{
 								//Add back the spaces to make the search meaningful.
@@ -378,7 +378,7 @@ namespace Dictionariosaur
 
 								tmpSearchString.Append(tmpCommandArguments[tmpCounter].ToString());
 							}
-							
+
 							SendTelnetAlphaWordList (pEventArgs, tmpSearchString.ToString().Trim());
 						}
 						else
@@ -396,11 +396,11 @@ namespace Dictionariosaur
 							long tmpIndexToFind = Convert.ToInt32(tmpCommandArguments[1]);
 							_TelnetServer.SendData ("Searching for word #["+tmpIndexToFind.ToString()+"] in the word list.", pEventArgs.Socket);
 							_TelnetServer.SendLineFeed (pEventArgs.Socket);
-							
+
 							if (_WordList.FindFirstByIndex (tmpIndexToFind))
 							{
 								_TelnetServer.SendData ("Found a match!", pEventArgs.Socket);
-								_TelnetServer.SendLineFeed (pEventArgs.Socket);								
+								_TelnetServer.SendLineFeed (pEventArgs.Socket);
 								_TelnetServer.SendData (String.Format(" {0}. {1}          Alphagram[{2}]", _WordList.CurrentItemKey ,_WordList.CurrentWord, _WordList.CurrentWordAlphagram), pEventArgs.Socket);
 								_TelnetServer.SendLineFeed (pEventArgs.Socket);
 							}
@@ -408,7 +408,7 @@ namespace Dictionariosaur
 							{
 								_TelnetServer.SendData ("No matches!\n\r", pEventArgs.Socket);
 								_TelnetServer.SendLineFeed (pEventArgs.Socket);
-							}			
+							}
 						}
 						else
 						{
@@ -425,7 +425,7 @@ namespace Dictionariosaur
 				}
 			}
 		}
-		
+
 		private void SendTelnetHelp (TelnetServerCommandEventArgs e)
 		{
 			_TelnetServer.SendData ("Available Commands:", e.Socket);
@@ -471,9 +471,9 @@ namespace Dictionariosaur
 		private void SendTelnetAlphaWordList (TelnetServerCommandEventArgs pEventArgs, string pSearchString)
 		{
 			bool tmpListingCompleted = false;
-			
+
 			int tmpMatchCount = 0;
-			
+
 			MutiTimeSpan tmpSearchTimer = new MutiTimeSpan();
 
 			if (_WordList.Count > 0)
@@ -484,28 +484,28 @@ namespace Dictionariosaur
 				_TelnetServer.SendLineFeed (pEventArgs.Socket);
 
 				tmpListingCompleted = !_WordList.FindFirstByAlphagram(pSearchString);
-				
+
 				while (!tmpListingCompleted)
 				{
 					//This display function is assuming that the words are no longer than 28 characters which is safe for scrabble words
 					_TelnetServer.SendData (String.Format(" {0,8}.   {1,-32}     {2}", _WordList.CurrentItemKey ,_WordList.CurrentWord, _WordList.CurrentWordAlphagram), pEventArgs.Socket);
 					_TelnetServer.SendLineFeed (pEventArgs.Socket);
 					tmpMatchCount++;
-					
+
 					//Bail out of the listing if it's the end of the list
 					tmpListingCompleted = _WordList.EOL;
-					
+
 					//This is to not display the last node if it isn't a match and we hit the EOL
 					tmpListingCompleted = !_WordList.FindNextByAlphagram (pSearchString);
 				}
-				
+
 				_TelnetServer.SendData ("==========================================================================-----", pEventArgs.Socket);
 				_TelnetServer.SendLineFeed (pEventArgs.Socket);
 				_TelnetServer.SendData (tmpMatchCount.ToString()+" Word(s) Matched the Pattern "+pSearchString, pEventArgs.Socket);
 				_TelnetServer.SendLineFeed (pEventArgs.Socket);
-				
+
 				tmpSearchTimer.TimeStamp();
-				
+
 				_TelnetServer.SendData ("Effective Time To Search: "+tmpSearchTimer.TimeDifference.ToString()+"ms", pEventArgs.Socket);
 				_TelnetServer.SendLineFeed (pEventArgs.Socket);
 			}
@@ -518,13 +518,13 @@ namespace Dictionariosaur
 
 		private void SendTelnetWordList (TelnetServerCommandEventArgs pEventArgs, string pSearchText)
 		{
-			bool tmpSearchAll = false;			
+			bool tmpSearchAll = false;
 			bool tmpDoneListing = false;
-			
+
 			int tmpMatchCount = 0;
 
 			MutiTimeSpan tmpSearchTimer = new MutiTimeSpan();
-			
+
 			if (pSearchText.ToUpper() == "ALL")
 			{
 				tmpSearchAll = true;
@@ -545,17 +545,17 @@ namespace Dictionariosaur
 				{
 					tmpDoneListing = !_WordList.FindFirstByWord (pSearchText);
 				}
-				
+
 				while (!tmpDoneListing)
 				{
 					//This display function is assuming that the words are no longer than 28 characters which is safe for scrabble words
 					_TelnetServer.SendData (String.Format(" {0,8}.   {1,-32}     {2}", _WordList.CurrentItemKey ,_WordList.CurrentWord, _WordList.CurrentWordAlphagram), pEventArgs.Socket);
 					_TelnetServer.SendLineFeed (pEventArgs.Socket);
 					tmpMatchCount++;
-					
+
 					//Bail out of the listing if it's the end of the list
 					tmpDoneListing = _WordList.EOL;
-					
+
 					if (tmpSearchAll)
 					{
 						_WordList.MoveNext();
@@ -563,17 +563,17 @@ namespace Dictionariosaur
 					else
 					{
 						//This is to not display the last node if it isn't a match and we hit the EOL
-						tmpDoneListing = !_WordList.FindNextByWord (pSearchText);						
+						tmpDoneListing = !_WordList.FindNextByWord (pSearchText);
 					}
 				}
-				
+
 				_TelnetServer.SendData ("==========================================================================-----", pEventArgs.Socket);
 				_TelnetServer.SendLineFeed (pEventArgs.Socket);
 				_TelnetServer.SendData (tmpMatchCount.ToString()+" Word(s) Matched the Pattern "+pSearchText, pEventArgs.Socket);
 				_TelnetServer.SendLineFeed (pEventArgs.Socket);
-				
+
 				tmpSearchTimer.TimeStamp();
-				
+
 				_TelnetServer.SendData ("Effective Time To Search: "+tmpSearchTimer.TimeDifference.ToString()+"ms", pEventArgs.Socket);
 				_TelnetServer.SendLineFeed (pEventArgs.Socket);
 			}
