@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+ This build file is a part of the Dictionariosaur application.
+ For full copyright and license information, please view the LICENSE file
+ which should be distributed with this source code.
+
+ @license MIT License
+ @copyright Copyright (c) 2013, Steven Velozo
+-->
+	<project name="Dictionariosaur" default="build" basedir=".">
+		<description>A simple Networking, Alphagram and Data Structure exercise.</description>
+		<property name="nant.settings.currentframework" value="mono-4.5" />
+		<property name="debug" value="true" overwrite="false" />
+		<property name="build.dir" value="bin" overwrite="false" />
+		<property name="source.dir" value="Source" />
+		<property name="content.dir" value="Content" />
+		<target name="clean" description="remove all generated files">
+			<delete file="${build.dir}/Dictionariosaur.exe" failonerror="false" />
+			<delete file="${build.dir}/Dictionariosaur.pdb" failonerror="false" />
+		</target>
+		<target name="distclean" description="remove all generated files">
+			<delete dir="${build.dir}" failonerror="false" />
+		</target>
+		<target name="build" description="Build Dictionariosaur">
+			<mkdir dir="${build.dir}" />
+			<csc target="exe" output="${build.dir}/Dictionariosaur.exe" debug="${debug}">
+				<sources>
+					<include name="${source.dir}/*.cs" />
+				</sources>
+			</csc>
+			<copy todir="${build.dir}">
+			<fileset basedir="${content.dir}"><include name="*" /></fileset>
+			</copy>
+		</target>
+	</project>
